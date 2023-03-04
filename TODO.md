@@ -1,0 +1,8 @@
+- [x] syncing route
+- [ ] change syncing route to post request
+- [ ] Add some form of security to login route
+- [ ] Try deploying as lambda
+- [ ] Only add tracks not on playlist already
+- [ ] recursive sync function for paginated responses
+- [ ] use multiprocessing to get own and external playlists
+- [ ] Refresh token functionality
