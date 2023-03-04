@@ -38,17 +38,18 @@ def callback():
         "refresh_token": token_resp.json()["refresh_token"]
     }
 
-@app.route("/sync")
+@app.route("/sync", methods=["POST"])
 def sync():
-    token = request.args.get('token', None)
+    request_data: dict = request.get_json()
+    token = request_data.get('token', None)
     if not token:
        return {"error": "token not provided"}, 401
     
-    own_playlist_id = request.args.get('own_playlist_id', None)
+    own_playlist_id = request_data.get('own_playlist_id', None)
     if not own_playlist_id:
         return {"error": "own_playlist_id not provided"}, 400
     
-    external_playlist_id = request.args.get('external_playlist_id', None)
+    external_playlist_id = request_data.get('external_playlist_id', None)
     if not external_playlist_id:
         return {"error": "external_playlist_id not provided"}, 400
 
@@ -87,9 +88,8 @@ def sync():
     try:
         add_to_playlist_resp.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        print(e)
         return {"error": "could not add tracks to playlist"}, 400
 
     return {
-        "external track uris": ",".join(external_track_uris)
+        "success": "playlist synced"
     }  
