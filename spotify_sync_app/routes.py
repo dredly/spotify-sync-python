@@ -1,6 +1,6 @@
 from spotify_sync_app import app
 from flask import redirect, request, url_for
-from .config import AUTHORIZE_URL, CLIENT_ID, SCOPES, CLIENT_SECRET, TOKEN_URL, API_BASE_URL
+from .config import AUTHORIZE_URL, CLIENT_ID, SCOPES, CLIENT_SECRET, TOKEN_URL, API_BASE_URL, USERS
 import requests
 
 # Health check to quickly verify if the API is running or not
@@ -8,14 +8,42 @@ import requests
 def home():
     return {"marco": "polo"}
 
-@app.route("/login")
+@app.route("/login", methods=["POST"])
 def login():
-    return redirect(AUTHORIZE_URL 
-        + "?response_type=code" 
-        + "&client_id=" + CLIENT_ID
-        + "&redirect_uri=" + url_for("callback", _external=True)
-        + "&scope=" + SCOPES
-    )
+    request_data: dict = request.get_json()
+    username = request_data.get('username', None)
+    password = request_data.get('password', None)
+    if not username or not password:
+        return {
+            "error": "login credentials not provided"
+        }, 401
+
+    usernames = [u.split(":")[0] for u in USERS]
+    passwords = [u.split(":")[1] for u in USERS]
+
+    if not username in usernames or not password in passwords:
+        return {
+            "error": "invalid login credentials"
+        }, 401
+
+    if usernames.index(username) != passwords.index(password):
+        return {
+            "error": "invalid login credentials"
+        }, 401
+
+    return {
+        "url": AUTHORIZE_URL 
+            + "?response_type=code" 
+            + "&client_id=" + CLIENT_ID
+            + "&redirect_uri=" + url_for("callback", _external=True)
+            + "&scope=" + SCOPES
+    }
+    # return redirect(AUTHORIZE_URL 
+    #     + "?response_type=code" 
+    #     + "&client_id=" + CLIENT_ID
+    #     + "&redirect_uri=" + url_for("callback", _external=True)
+    #     + "&scope=" + SCOPES
+    # )
 
 @app.route("/callback")
 def callback():

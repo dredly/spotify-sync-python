@@ -1,6 +1,6 @@
 - [x] syncing route
 - [x] change syncing route to post request
-- [ ] Add some form of security to login route
+- [x] Add some form of security to login route
 - [ ] Try deploying as lambda
 - [ ] Only add tracks not on playlist already
 - [ ] recursive sync function for paginated responses
