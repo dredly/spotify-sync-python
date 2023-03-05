@@ -75,7 +75,7 @@ def sync():
     if not external_playlist_id:
         return {"error": "external_playlist_id not provided"}, 400
 
-    own_playlist_resp = requests.get(API_BASE_URL + "playlists/" + own_playlist_id, headers={
+    own_playlist_resp = requests.get(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", headers={
         "Authorization": "Bearer " + token
     })
 
@@ -93,24 +93,28 @@ def sync():
     except requests.exceptions.HTTPError:
         return {"error": "external_playlist not found"}, 404
     
+    own_track_items = own_playlist_resp.json()["items"]
+    own_track_uris =  [oti["track"]["uri"] for oti in own_track_items]
+
     external_track_items = external_playlist_resp.json()["items"]
     external_track_uris = [eti["track"]["uri"] for eti in external_track_items]
 
-    print({
-        "uris": external_track_uris
-    })
+    track_uris_to_add = [etu for etu in external_track_uris if etu not in own_track_uris]
+
+    print("gonna add")
+    print(track_uris_to_add)
 
     add_to_playlist_resp =  requests.post(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", json={
-        "uris": external_track_uris
+        "uris": track_uris_to_add
     }, headers={
         "Authorization": "Bearer " + token,
         "Content-Type": "application/json"
     })
-
+    
     try:
         add_to_playlist_resp.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        return {"error": "could not add tracks to playlist"}, 400
+    except requests.exceptions.HTTPError:
+        return {"error", "could not sync to playlist"}, 400
 
     return {
         "success": "playlist synced"
