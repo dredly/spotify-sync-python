@@ -1,5 +1,5 @@
 from spotify_sync_app import app
-from flask import redirect, request, url_for
+from flask import request, url_for
 from .config import AUTHORIZE_URL, CLIENT_ID, SCOPES, CLIENT_SECRET, TOKEN_URL, API_BASE_URL, USERS
 import requests
 
@@ -38,12 +38,6 @@ def login():
             + "&redirect_uri=" + url_for("callback", _external=True)
             + "&scope=" + SCOPES
     }
-    # return redirect(AUTHORIZE_URL 
-    #     + "?response_type=code" 
-    #     + "&client_id=" + CLIENT_ID
-    #     + "&redirect_uri=" + url_for("callback", _external=True)
-    #     + "&scope=" + SCOPES
-    # )
 
 @app.route("/callback")
 def callback():
