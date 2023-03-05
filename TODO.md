@@ -6,3 +6,4 @@
 - [ ] recursive sync function for paginated responses
 - [ ] use multiprocessing to get own and external playlists
 - [ ] Refresh token functionality
+- [ ] Use proper asymmetric encryption for credentials
