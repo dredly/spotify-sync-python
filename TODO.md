@@ -3,10 +3,10 @@
 - [x] Add some form of security to login route
 - [x] Deploy to render
 - [x] Only add tracks not on playlist already
-- [ ] recursive sync function for paginated responses
+- [x] recursive sync function for paginated responses
     - [x] get paginated external playlist tracks
     - [x] get paginated own playlist tracks
-    - [ ] perform sync with paginated responses
+    - [x] perform sync with paginated responses
 - [ ] Finish refactoring requests code into spotify_api_client
 - [ ] Refresh token functionality
 - [ ] Use proper asymmetric encryption for credentials

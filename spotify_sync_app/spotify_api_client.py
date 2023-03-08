@@ -1,9 +1,9 @@
 import requests
 from typing import List
 
-from .config import API_BASE_URL
+from .config import CHUNK_SIZE
 
-def get_own_track_uris(url: str, token: str):
+def get_own_track_uris(url: str, token: str) -> List[str]:
     resp = requests.get(url, headers={
         "Authorization": "Bearer " + token
     })
@@ -15,7 +15,7 @@ def get_own_track_uris(url: str, token: str):
         return own_track_uris + get_own_track_uris(next_link, token)
     return own_track_uris
 
-def get_external_track_uris(url: str, token: str, own_track_uris: List[str]):
+def get_external_track_uris(url: str, token: str, own_track_uris: List[str]) -> List[str]:
     resp = requests.get(url, headers={
         "Authorization": "Bearer " + token
     })
@@ -27,3 +27,13 @@ def get_external_track_uris(url: str, token: str, own_track_uris: List[str]):
     if next_link:
         return track_uris_to_add + get_external_track_uris(next_link, token, own_track_uris)
     return track_uris_to_add
+
+def sync_tracks(url: str, token: str, track_uris: List[str]) -> None:
+    tracks_chunked = [track_uris[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE] for i in range((len(track_uris) + CHUNK_SIZE - 1) // CHUNK_SIZE )]
+    for chunk in tracks_chunked:
+        resp = requests.post(url, headers={
+            "Authorization": "Bearer " + token
+        }, json={
+            "uris": chunk
+        })
+        resp.raise_for_status()

@@ -2,7 +2,7 @@ from typing import List
 from spotify_sync_app import app
 from flask import request, url_for
 from .config import AUTHORIZE_URL, CLIENT_ID, SCOPES, CLIENT_SECRET, TOKEN_URL, API_BASE_URL, USERS
-from .spotify_api_client import get_own_track_uris, get_external_track_uris
+from .spotify_api_client import get_own_track_uris, get_external_track_uris, sync_tracks
 import requests
 
 # Health check to quickly verify if the API is running or not
@@ -80,7 +80,8 @@ def sync():
     try:
         own_track_uris: List[str] = get_own_track_uris(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", token)
         print(len(own_track_uris))
-    except requests.exceptions.HTTPError:
+    except requests.exceptions.HTTPError as e:
+        print(e)
         return {"error": "own_playlist not found"}, 404
 
     try:
@@ -93,6 +94,10 @@ def sync():
     except requests.exceptions.HTTPError:
         return {"error": "external_playlist not found"}, 404
 
+    try:
+        sync_tracks(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", token, external_track_uris)
+    except requests.exceptions.HTTPError:
+        return {"error", "could not sync to playlist"}, 400
 
     return {
         "success": "playlist synced"
