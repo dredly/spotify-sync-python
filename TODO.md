@@ -4,6 +4,8 @@
 - [x] Deploy to render
 - [x] Only add tracks not on playlist already
 - [ ] recursive sync function for paginated responses
+    - [x] get paginated external playlist tracks
+    - [ ] get paginated own playlist tracks
 - [ ] use multiprocessing to get own and external playlists
 - [ ] Refresh token functionality
 - [ ] Use proper asymmetric encryption for credentials
