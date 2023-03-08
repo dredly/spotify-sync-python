@@ -2,7 +2,7 @@ from typing import List
 from spotify_sync_app import app
 from flask import request, url_for
 from .config import AUTHORIZE_URL, CLIENT_ID, SCOPES, CLIENT_SECRET, TOKEN_URL, API_BASE_URL, USERS
-from .spotify_api_client import get_external_track_uris
+from .spotify_api_client import get_own_track_uris, get_external_track_uris
 import requests
 
 # Health check to quickly verify if the API is running or not
@@ -77,21 +77,11 @@ def sync():
     if not external_playlist_id:
         return {"error": "external_playlist_id not provided"}, 400
 
-    own_playlist_resp = requests.get(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", headers={
-        "Authorization": "Bearer " + token
-    })
-
     try:
-        own_playlist_resp.raise_for_status()
+        own_track_uris: List[str] = get_own_track_uris(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", token)
+        print(len(own_track_uris))
     except requests.exceptions.HTTPError:
         return {"error": "own_playlist not found"}, 404
-
-    own_track_items = own_playlist_resp.json()["items"]
-    own_track_uris =  [oti["track"]["uri"] for oti in own_track_items]
-
-    # external_playlist_resp = requests.get(API_BASE_URL + "playlists/" + external_playlist_id + "/tracks", headers={
-    #     "Authorization": "Bearer " + token
-    # })
 
     try:
         external_track_uris: List[str] = get_external_track_uris(
@@ -103,25 +93,6 @@ def sync():
     except requests.exceptions.HTTPError:
         return {"error": "external_playlist not found"}, 404
 
-    # external_track_items = external_playlist_resp.json()["items"]
-    # external_track_uris = [eti["track"]["uri"] for eti in external_track_items]
-
-    # track_uris_to_add = [etu for etu in external_track_uris if etu not in own_track_uris]
-
-    # print("gonna add")
-    # print(track_uris_to_add)
-
-    # add_to_playlist_resp =  requests.post(API_BASE_URL + "playlists/" + own_playlist_id + "/tracks", json={
-    #     "uris": track_uris_to_add
-    # }, headers={
-    #     "Authorization": "Bearer " + token,
-    #     "Content-Type": "application/json"
-    # })
-    
-    # try:
-    #     add_to_playlist_resp.raise_for_status()
-    # except requests.exceptions.HTTPError:
-    #     return {"error", "could not sync to playlist"}, 400
 
     return {
         "success": "playlist synced"

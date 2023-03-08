@@ -3,6 +3,18 @@ from typing import List
 
 from .config import API_BASE_URL
 
+def get_own_track_uris(url: str, token: str):
+    resp = requests.get(url, headers={
+        "Authorization": "Bearer " + token
+    })
+    resp.raise_for_status()
+    next_link = resp.json()["next"]
+    own_track_items = resp.json()["items"]
+    own_track_uris = [oti["track"]["uri"] for oti in own_track_items]
+    if next_link:
+        return own_track_uris + get_own_track_uris(next_link, token)
+    return own_track_uris
+
 def get_external_track_uris(url: str, token: str, own_track_uris: List[str]):
     resp = requests.get(url, headers={
         "Authorization": "Bearer " + token

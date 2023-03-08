@@ -5,7 +5,8 @@
 - [x] Only add tracks not on playlist already
 - [ ] recursive sync function for paginated responses
     - [x] get paginated external playlist tracks
-    - [ ] get paginated own playlist tracks
-- [ ] use multiprocessing to get own and external playlists
+    - [x] get paginated own playlist tracks
+    - [ ] perform sync with paginated responses
+- [ ] Finish refactoring requests code into spotify_api_client
 - [ ] Refresh token functionality
 - [ ] Use proper asymmetric encryption for credentials
